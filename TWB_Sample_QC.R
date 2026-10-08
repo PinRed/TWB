@@ -2,7 +2,7 @@
 ## ==== TWB1 Sample ====
 library(dplyr)
 
-path = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/genotyped_GP_v20251211_n27652"
+path = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652"
 setwd(path)
 
 # 建立存放Sample Batch 的資料夾
@@ -43,7 +43,7 @@ for (b in Batch){
 
 # SNPs Batch
 library(readxl)
-path = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/genotyped_GP_v20251211_n27652"
+path = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652"
 setwd(path)
 
 TWB1_BR <- data.frame(read_excel("/SATA2TB/Taiwan_Biobank/Data_supply/TWB1_BatchRecommended_na35v2_20180917.xlsx", sheet = 1))
@@ -80,7 +80,7 @@ for (b in batchs){
 
 
 ## ==== TWB2 ====
-path = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/genotyped_GP_v20251211_n138615"
+path = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615"
 setwd(path)
 
 if(!file.exists("Sample_Batch")){
@@ -116,7 +116,7 @@ for (b in Batch){
 }
 
 # SNPs Batch
-path = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/genotyped_GP_v20251211_n138615"
+path = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615"
 setwd(path)
 
 TWB2_BR <- data.frame(read.csv("/SATA2TB/Taiwan_Biobank/Data_supply/TWB2_BatchRecommended_na36r2a2_20210913.csv"))
@@ -147,7 +147,7 @@ for (b in batchs){
 
 # ==== Batch GCP < 95的的 sample 彙整為 {ARRAY}_S01_GCR_exclude.txt ====
 ## ==== TWB1 ====
-path1 = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/genotyped_GP_v20251211_n27652/Genotype_Call_Rate"
+path1 = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Genotype_Call_Rate"
 setwd(path1)
 
 # List All .smiss files
@@ -187,7 +187,7 @@ write.table(
 library(dplyr)
 library(purrr)
 
-path2 = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/genotyped_GP_v20251211_n138615/Genotype_Call_Rate"
+path2 = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Genotype_Call_Rate"
 setwd(path2)
 
 # List All .smiss files
@@ -224,11 +224,11 @@ write.table(
 
 # ==== View Sex check ====
 ## ==== TWB1 ====
-TWB1_sex <- read.table("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/genotyped_GP_v20251211_n27652/TWB1_S02_sex.sexcheck")
+TWB1_sex <- read.table("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Primary_Sample_QC/Sex/TWB1_S02_sex.sexcheck")
 table(TWB1_sex$V5,TWB1_sex$V4)
 
 ## ==== TWB2 ====
-TWB2_sex <- read.table("/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/genotyped_GP_v20251211_n138615/TWB2_S02_sex_v2.sexcheck")
+TWB2_sex <- read.table("/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Primary_Sample_QC/Sex/TWB2_S02_sex_v2.sexcheck")
 table(TWB2_sex$V4)
 
 mismatch_or_na <- TWB2_sex[
@@ -301,16 +301,16 @@ run_het_qc <- function(path, het_path, batch_df, prefix) {
 
 ## ===== TWB1 ===== 
 run_het_qc(
-  path = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/genotyped_GP_v20251211_n27652",
-  het_path = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/genotyped_GP_v20251211_n27652/TWB1_S03_het_pending.het",
+  path = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Primary_Sample_QC/HET",
+  het_path = "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Primary_Sample_QC/HET/TWB1_S03_het_pending.het",
   batch_df = TWB1_batch,
   prefix   = "TWB1"
 )
 
 ## ==== TWB2 ====
 run_het_qc(
-  path = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/genotyped_GP_v20251211_n138615",
-  het_path = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/genotyped_GP_v20251211_n138615/TWB2_S03_het_pending.het",
+  path = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Primary_Sample_QC/HET",
+  het_path = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Primary_Sample_QC/HET/TWB2_S03_het_pending.het",
   batch_df = TWB2_batch,
   prefix   = "TWB2"
 )
