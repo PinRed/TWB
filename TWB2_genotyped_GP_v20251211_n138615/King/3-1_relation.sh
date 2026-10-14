@@ -1,3 +1,20 @@
+#!/bin/bash
+# ==============================================================================
+# Pipeline Step: TWB2 Familial Relatedness Check
+# Target Dataset: TWB2 cohort
+# Inputs:
+#   - TWB2_S03_all_QC_clean.{bed,bim,fam} (TWB2 dataset after SNP QC)
+# Outputs:
+#   - TWB2_S04_qc.{bed,bim,fam} (TWB2 dataset after QC for relatedness check)
+#   - TWB2_S04_prune.{bed,bim,fam} (TWB2 dataset after LD pruning)
+#   - TWB2_S04_duplicate.kin0 (KING duplicate check results)
+#   - TWB2_relatedness_deg2plus.kin0 (KING relatedness check results for 2nd degree relatives)
+# Workflow:
+#   1. Perform QC on the dataset for relatedness check missingness > 0.01 and  MAF > 0.05
+#   2. Perform LD pruning to reduce SNP redundancy 5000kb 1 0.2
+#   3. Run King Table filter > 0.0884 to identify related samples (2nd degree relatives and above)
+# ==============================================================================
+
 # 從基本QC完的資料中， 取出近親樣本 > 0.0884 (2nd degree relatives)
 # 後續利用R做PCAiR
 ###############################################################
@@ -8,9 +25,6 @@
 
 ARRAY=TWB2
 
-# SNP QC
-# geno 0.02
-# maf 0.05
 plink2 \
   --bfile ../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean \
   --geno 0.01 \

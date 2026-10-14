@@ -1,3 +1,17 @@
+# ===============================================================================
+# Pipeline Step: Primary SNP QC 
+# Target Dataset: TWB2 cohort
+# Inputs:
+#   - TWB2_S03_QC.bim: SNP information file (bim) from PLINK QC step
+# Outputs:
+#   - TWB2_PSNPQC01_structural_keep.snplist: List of SNPs that pass structural QC checks
+# Workflow:
+#   1. Extract chromosome, position, and allele information
+#   2. Validate chromosome and base pair positions
+#   3. Identify and exclude SNPs with duplicate IDs or genomic loci
+#   4. Check for canonical biallelic SNPs and exclude non-canonical
+#   5. Save the list of SNPs that pass all structural QC checks
+# ===============================================================================
 
 ## ================== TWB2 ============================
 setwd("/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Primary_SNP_QC")
