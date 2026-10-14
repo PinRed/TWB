@@ -1,9 +1,9 @@
-setwd("/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis")
-
 # ============================================================
 # Random Forest classification
-# Training : 1KGP
+# Training : 1KGP EAS samples
+#   input  : 1KGP+SGDP+TWB2 PCA (PC1~PC6) 
 # Prediction : TWB2
+#   input  : 1KGP+SGDP+TWB2 PCA (PC1~PC6)
 #
 # Classes:
 #   AFR / AMR / EAS / EUR / SAS
@@ -13,9 +13,8 @@ setwd("/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_st
 #   otherwise     -> UNCLASSIFIED
 # ============================================================
 
-
+setwd("/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis")
 library(randomForest)
-
 
 # ============================================================
 # 1. 1KGP metadata

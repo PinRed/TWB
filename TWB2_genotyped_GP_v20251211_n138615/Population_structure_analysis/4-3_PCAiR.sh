@@ -1,3 +1,25 @@
+#!/bin/bash
+# ==============================================================================
+# Pipeline Step: EAS Sample Extraction, SNP QC, LD Pruning & Kinship Analysis
+# Target Dataset: TWB2 cohort (EAS)
+# 
+# Inputs:
+#   - TWB2_S04_batch_SNPs_removed.{bed,bim,fam} 
+#     (TWB2 post-sample QC, preliminary SNP QC, and batch effect SNP removal)
+#   - TWB2_EAS.id (List of target East Asian individuals to keep)
+#
+# Outputs:
+#   - TWB2_EAS_pcair_prune.{prune.in,prune.out}: LD-pruned SNP list for PC-AIR
+#   - TWB2_EAS_pcair_kin.kin0.zst: Compressed KING kinship coefficient table
+#   - TWB2_EAS_pcair_kin.kin0: Decompressed KING kinship table filtered at > 3rd-degree ($\ge 0.02209709$)
+#
+# Do:
+#   1. Extract EAS individuals, filter autosomes, apply missingness (geno 0.01) and MAF (0.05) filters, and perform LD pruning 5000kb 0.3
+#   2. Compute genetic relationship coefficients (KING) using the pruned SNP set
+#   3. Filter related pairs using a 3rd-degree relationship threshold ($0.02209709$)
+#   4. Decompress the resulting KING output file
+# ==============================================================================
+
 ARRAY=TWB2
 twb2_prelim="../King/${ARRAY}_S04_batch_SNPs_removed"
 eas_id="${ARRAY}_EAS.id"

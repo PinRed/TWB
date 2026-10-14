@@ -1,3 +1,20 @@
+# ============================================================
+# Random Forest classification
+# Training : 1KGP EAS samples
+#   input  : 1KGP+SGDP own PCA (PC1~PC6) 
+# Prediction : TWB2
+#   input  : TWB2 own PCA (PC1~PC6) 
+#
+# Classes:
+#   AFR / AMR / EAS / EUR / SAS
+#
+# Rule:
+#   P(EAS) > 0.8  -> EAS
+#   otherwise     -> UNCLASSIFIED
+# ============================================================
+
+
+
 library(scales)
 setwd("/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis/PCA_temp")
 
