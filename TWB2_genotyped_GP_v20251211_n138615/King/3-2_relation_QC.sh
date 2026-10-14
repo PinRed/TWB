@@ -8,7 +8,7 @@ awk '{print $1, $1}' \
 # Catch common SNPs and remove related samples
 plink2 \
   --bfile ../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean \
-  --extract ../SNP_QC_Batch/intersect_snps.id \
+  --extract ../Batch-level_SNP_QC/intersect_snps.id \
   --make-bed \
   --out ${ARRAY}_S04_batch_SNPs_removed
 
