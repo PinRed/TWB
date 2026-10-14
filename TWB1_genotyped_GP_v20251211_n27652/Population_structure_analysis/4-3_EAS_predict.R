@@ -1,20 +1,19 @@
-# TWB1
-
-setwd("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis")
-
 # ============================================================
 # Random Forest classification
-# Training : 1KGP
+# Training : 1KGP EAS samples
+#   input  : 1KGP+SGDP+TWB1 PCA (PC1~PC6) 
 # Prediction : TWB1
+#   input  : 1KGP+SGDP+TWB1 PCA (PC1~PC6)
 #
 # Classes:
 #   AFR / AMR / EAS / EUR / SAS
 #
 # Rule:
-#   P(EAS) > 0.9  -> EAS
+#   P(EAS) > 0.8  -> EAS
 #   otherwise     -> UNCLASSIFIED
 # ============================================================
 
+setwd("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis")
 
 library(randomForest)
 

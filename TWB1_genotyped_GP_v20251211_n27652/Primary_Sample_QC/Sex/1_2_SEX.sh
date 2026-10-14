@@ -1,3 +1,16 @@
+#!/bin/bash
+# ==============================================================================
+# Pipeline Step: TWB1 Sex Check
+# Target Dataset: TWB1 cohort
+# Inputs:
+#   - TWB1_S01_GCR.{bed,bim,fam} (TWB1 dataset after GCR QC)
+# Outputs:
+#   - TWB1_S02_sex.{sexcheck,summary.tsv,problems.txt} (Sex check results and summary)
+# Do:
+#   1. Perform sex check using PLINK2
+#   2. Generate summary statistics and identify problematic samples
+# =============================================================================
+
 WORKING_PREFIX=../GCR/TWB1_S01_GCR
 ARRAY=TWB1
 

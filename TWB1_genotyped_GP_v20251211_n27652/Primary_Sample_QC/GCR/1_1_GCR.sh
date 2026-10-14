@@ -1,4 +1,18 @@
-## Linux
+#!/bin/bash
+# ==============================================================================
+# Pipeline Step: TWB2 Batch Sample Missing Rate Calculation
+# Target Dataset: TWB1 cohort 
+# Inputs:
+#   - TWB1.hg19.GP.20251211.{bed,bim,fam} (TWB1 genotyped dataset)
+#   - TWB1_B{1..14}_samples.keep (List of samples for each batch)
+# Outputs:
+#   - Missing/TWB1_Batch{1..14}_missing.{imiss,imiss.log} (Missing rate for each batch)
+#   - TWB1_S01_GCR.{bed,bim,fam} (TWB1 dataset after removing samples failing GCR QC)
+# Do:
+#   1. Calculate missing rate for each batch of TWB1 samples
+#   2. Remove samples failing GCR QC and create a new dataset
+# ==============================================================================
+
 PREFIX="../../TWB1.hg19.GP.20251211"
 # TWB 1 Batch sample missing rate 
 for BATCH in {1..14}; do

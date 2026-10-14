@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# ========================================
+# Script: 4-1_hg19_to_hg38.sh
+# Purpose: Convert PLINK dataset from hg19 to hg38 using LiftOver
+# ========================================
 
 set -euo pipefail
 

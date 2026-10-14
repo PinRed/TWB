@@ -1,3 +1,21 @@
+#!/bin/bash
+# ===============================================================================
+# Pipeline Step: Familial relatedness / highly similar genomes
+# Target Dataset: TWB1 cohort
+# Inputs:
+#   - TWB1_S04_ldpruned.{bed,bim,fam}: LD-pruned genotype data for relatedness check
+#   - TWB1_relatedness_deg2plus.kin0: KING relatedness check results for 2nd degree relatives
+# Outputs:
+#   - TWB1.PCAiR.tsv: PCA results from PC-AiR
+#   - TWB1.relatedsamples.tsv: List of related samples identified by PC-AiR
+#   - TWB1.unrelatedsamples.tsv: List of unrelated samples identified by PC-AiR
+# Workflow:
+#   1. Read KING output and convert to matrix format(.gds)
+#   2. Check sample IDs and reorder KING matrix to match genotype data
+#   3. Perform PC-AiR analysis to identify related and unrelated samples
+#   4. Save PCA results and lists of related/unrelated samples
+# ===============================================================================
+
 # ==== Familial relatedness / highly similar genomes ====
 library(GENESIS)
 library(GWASTools)
@@ -128,21 +146,4 @@ write.table(
   quote = FALSE
 )
 
-write.table(
-  mypcair$values,
-  file = "TWB1_filter.eigenvalue.txt",
-  col.names = TRUE,
-  row.names = TRUE,
-  sep = "\t",
-  quote = FALSE
-)
-
-write.table(
-  mypcair$varprop,
-  file = "TWB1_filter.varprop.txt",
-  col.names = TRUE,
-  row.names = TRUE,
-  sep = "\t",
-  quote = FALSE
-)
 

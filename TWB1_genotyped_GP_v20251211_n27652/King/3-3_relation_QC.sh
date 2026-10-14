@@ -1,3 +1,17 @@
+#!/bin/bash
+# ==============================================================================
+# Pipeline Step: TWB1 Relatedness Check
+# Target Dataset: TWB1 cohort
+# Inputs:
+#   - TWB1_S03_all_QC_clean.{bed,bim,fam} (TWB1 dataset after SNP QC)
+# Outputs:
+#   - TWB1_S04_batch_SNPs_removed.{bed,bim,fam} (TWB1 dataset after removing batch level SNPs)
+#   - TWB1_S05.{bed,bim,fam} (TWB1 dataset after removing related samples)
+# Workflow:
+#   1. Remove batch level SNPs and related samples from the dataset
+#   2. Create a new dataset after removing the failed samples
+# ==============================================================================
+
 # 過濾Batch SNP missingness、allene-frequency 以及 related samples
 ARRAY=TWB1
 
