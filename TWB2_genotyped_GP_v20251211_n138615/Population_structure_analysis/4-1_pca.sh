@@ -1,9 +1,10 @@
 #!/bin/bash
+mkdir -p meta_twb2_pca
 
 onekgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kGP/1kgp_QC_LD"
 sdgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/SGDP/plink_output/sgdp_hg38_QC"
 twb2="../King/TWB2_S05"
-outdir="."
+outdir="meta_twb2_pca"
 
 filter_ambiguous() {
   awk '
@@ -88,7 +89,7 @@ plink \
   --bfile "${outdir}/all_common" \
   --extract "${outdir}/TWB2_for_pca.prune.in" \
   --make-bed \
-  --out "${outdir}/TWB2_pca"
+  --out "${outdir}/TWB2_S05_pca"
 
 
 ############################################################
@@ -100,9 +101,9 @@ echo "Step 6: PCA"
 echo "=========================================="
 
 plink2 \
-  --bfile "${outdir}/TWB2_pca" \
+  --bfile "${outdir}/TWB2_S05_pca" \
   --pca 20 approx \
-  --out "${outdir}/TWB2_pca"
+  --out "${outdir}/TWB2_S05_pca"
 
 
 ############################################################
@@ -115,14 +116,14 @@ echo "PCA completed!"
 echo "=========================================="
 
 echo "Final BED files:"
-echo "${outdir}/TWB2_pca.bed"
-echo "${outdir}/TWB2_pca.bim"
-echo "${outdir}/TWB2_pca.fam"
+echo "${outdir}/TWB2_S05_pca.bed"
+echo "${outdir}/TWB2_S05_pca.bim"
+echo "${outdir}/TWB2_S05_pca.fam"
 
 echo ""
 echo "PCA results:"
-echo "${outdir}/TWB2_pca.eigenvec"
-echo "${outdir}/TWB2_pca.eigenval"
+echo "${outdir}/TWB2_S05_pca.eigenvec"
+echo "${outdir}/TWB2_S05_pca.eigenval"
 
 echo "=========================================="
 echo "Each Step Number of SNPs"

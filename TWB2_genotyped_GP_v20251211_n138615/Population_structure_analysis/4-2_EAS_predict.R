@@ -53,7 +53,7 @@ rm(TWB2)
 # ============================================================
 
 twb2pca <- read.table(
-  "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis/TWB2_pca.eigenvec",
+  "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis/meta_twb2_pca/TWB2_S05_pca.eigenvec",
   header = FALSE,
   stringsAsFactors = FALSE
 )
@@ -226,6 +226,8 @@ print(
   table(rf_result$Final_classification)
 )
 
+eas_id <- data.frame(FID = eas, IID = eas)
+
 
 # ============================================================
 # 14. Save result
@@ -240,7 +242,7 @@ write.table(
 )
 
 write.table(
-  eas,
+  eas_id,
   file = "TWB2_EAS.id",
   sep = "\t",
   quote = FALSE,
