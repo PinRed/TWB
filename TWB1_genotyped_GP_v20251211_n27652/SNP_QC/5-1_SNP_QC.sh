@@ -21,7 +21,7 @@ set -euo pipefail
 
 ARRAY="TWB1"
 
-INPUT="../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean"
+INPUT="SNP_QC_FILE/TWB1_S06_hg38"
 FINAL_SAMPLES="../Population_structure_analysis/${ARRAY}_EAS.id"
 OUTDIR="SNP_QC_temp"
 
@@ -40,17 +40,39 @@ plink \
     --make-bed \
     --out "${OUTDIR}/${ARRAY}_finalsample_base"
 
+
 ############################################################
-# F-SNPQC-02: SNP call rate
+# F-SNPQC-01.5: Remove duplicate SNP IDs
 #
-# --geno 0.02 removes SNPs with missingness > 0.02.
+# Keep the first occurrence of each SNP ID.
 ############################################################
+
+
+awk '
+    seen[$2]++ { print $2 }
+' "${OUTDIR}/${ARRAY}_finalsample_base.bim" \
+  | sort -u \
+  > "${OUTDIR}/${ARRAY}_duplicate_snps.exclude"
+
+printf "Duplicate SNP IDs excluded: %d\n" \
+    "$(wc -l < "${OUTDIR}/${ARRAY}_duplicate_snps.exclude")"
 
 plink \
     --bfile "${OUTDIR}/${ARRAY}_finalsample_base" \
+    --exclude "${OUTDIR}/${ARRAY}_duplicate_snps.exclude" \
+    --make-bed \
+    --out "${OUTDIR}/${ARRAY}_deduplicated"
+
+############################################################
+# F-SNPQC-02: SNP call rate
+############################################################
+
+plink \
+    --bfile "${OUTDIR}/${ARRAY}_deduplicated" \
     --geno 0.02 \
     --make-bed \
     --out "${OUTDIR}/${ARRAY}_F_SNPQC02_callrate"
+
 
 ############################################################
 # F-SNPQC-03: Calculate allele frequencies
@@ -122,6 +144,7 @@ plink \
     --make-bed \
     --out "${OUTDIR}/${ARRAY}_F_SNPQC04_hwe"
 
+
 ############################################################
 # Summary
 ############################################################
@@ -139,7 +162,9 @@ echo
 echo "HWE exclusion list:"
 echo "  ${OUTDIR}/${ARRAY}_F_SNPQC04_hwe.exclude"
 
+
 rm -rf "${OUTDIR}/${ARRAY}_finalsample_base."* \
+       "${OUTDIR}/${ARRAY}_deduplicated."* \
        "${OUTDIR}/${ARRAY}_F_SNPQC02_callrate."* \
        "${OUTDIR}/${ARRAY}_F_SNPQC03_freq."* \
        "${OUTDIR}/${ARRAY}_F_SNPQC03_polymorphic."* \

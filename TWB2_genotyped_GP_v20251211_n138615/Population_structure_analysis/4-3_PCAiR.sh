@@ -42,6 +42,11 @@ plink2 --bfile ${twb2_prelim} \
   --indep-pairwise 5000kb 0.3 \
   --out ${ARRAY}_EAS_pcair_prune
 
+plink2 --bfile ${twb2_prelim} \
+  --keep ${eas_id} \
+  --make bed \
+  --out ${ARRAY}_EAS_pcair
+
 
 plink2 --bfile ${twb2_prelim} \
   --keep ${eas_id} \

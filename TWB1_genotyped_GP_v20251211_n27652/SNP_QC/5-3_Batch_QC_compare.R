@@ -99,7 +99,7 @@ fwrite(merged_summary, out_summary_file, sep = "\t")
 
 # Export plain list of SNP IDs flagged as problematic for subsequent --exclude in PLINK
 problematic_ids <- merged_summary[PROBLEMATIC_ANY == TRUE, ID]
-fwrite(data.table(ID = problematic_ids), out_problem_file, col.names = FALSE, sep = "\t")
+fwrite(data.table(FID = problematic_ids, IID = problematic_ids), out_problem_file, col.names = FALSE, sep = "\t")
 
 # 7. Print summary statistics
 cat("\n========================================\n")
@@ -112,3 +112,12 @@ cat(sprintf("Total unique problematic variants: %d\n", length(problematic_ids)))
 cat(sprintf("Detailed report saved to : %s\n", out_summary_file))
 cat(sprintf("Problematic SNP list saved: %s\n", out_problem_file))
 cat("========================================\n")
+
+# 8. Delete Batch file
+
+for (i in seq_along(batches)){
+  file_path <- file.path(outdir,paste0("B",i))
+  cat("\n=====================================\n")
+  cat(sprintf("Delete %s", file_path))
+  unlink(file_path, recursive = TRUE, force = TRUE)
+}

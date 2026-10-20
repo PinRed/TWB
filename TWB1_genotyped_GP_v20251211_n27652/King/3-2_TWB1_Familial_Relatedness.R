@@ -23,7 +23,7 @@ library(SNPRelate)
 
 ## ==== TWB1 ====
 
-
+setwd("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/King")
 kin <- read.table(
   "TWB1_relatedness_deg2plus.kin0",
   header = TRUE,
@@ -61,7 +61,7 @@ cat("Non-zero entries:",
 
 ### ============ 2. Read genotype ============
 
-# snpgdsBED2GDS(bed.fn = "TWB1_S04_ldpruned.bed", bim.fn = "TWB1_S04_ldpruned.bim", fam.fn = "TWB1_S04_ldpruned.fam", out.gdsfn = "TWB2_S01_ldpruned.gds")
+snpgdsBED2GDS(bed.fn = "TWB1_S04_ldpruned.bed", bim.fn = "TWB1_S04_ldpruned.bim", fam.fn = "TWB1_S04_ldpruned.fam", out.gdsfn = "TWB1_S04_ldpruned.gds")
 
 geno <- GdsGenotypeReader(
   filename = "TWB1_S04_ldpruned.gds"

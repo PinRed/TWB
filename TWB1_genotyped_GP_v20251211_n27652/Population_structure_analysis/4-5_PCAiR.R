@@ -25,6 +25,7 @@ library(Matrix)
 library(GENESIS)
 library(GWASTools)
 library(gdsfmt)
+library(SNPRelate)
 
 setwd("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis")
 
@@ -74,6 +75,7 @@ K <- sparseMatrix(
 # ============================================================
 # 3. Read genotype GDS
 # ============================================================
+snpgdsBED2GDS(bed.fn = "TWB1_EAS_pcair.bed", bim.fn = "TWB1_EAS_pcair.bim", fam.fn = "TWB1_EAS_pcair.fam", out.gdsfn = "TWB1_EAS_pcair.gds")
 
 gds_file <- "TWB1_EAS_pcair.gds"
 
@@ -143,7 +145,8 @@ pcair_fit <- pcair(
   kinobj = K,
   divobj = NULL,
   kin.thresh = 2^(-11/2),
-  snp.include = gds_snp_ids
+  snp.include = gds_snp_ids,
+  num.cores = 16
 )
 
 # ============================================================
@@ -160,3 +163,5 @@ saveRDS(
   pcair_fit,
   file = "TWB1_EAS_pcair_fit.rds"
 )
+
+del(TWB1_EAS_pcair.gds)

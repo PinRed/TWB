@@ -15,6 +15,12 @@
 
 setwd("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis")
 
+# Install the package if it isn't already installed
+if (!require("randomForest", character.only = TRUE)) {
+  install.packages("randomForest")
+}
+
+# Load the library
 library(randomForest)
 
 
@@ -54,7 +60,7 @@ rm(TWB1)
 # ============================================================
 
 TWB1pca <- read.table(
-  "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis/twb1_pca.eigenvec",
+  "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis/meta_twb1_pca/TWB1_S05_pca.eigenvec",
   header = FALSE,
   stringsAsFactors = FALSE
 )
@@ -215,6 +221,11 @@ rf_result <- data.frame(
 
 eas <- rf_result[rf_result$Final_classification == "EAS",]$IID
 
+eas_id <- data.frame(
+  IID = eas,
+  FID = eas,
+  stringsAsFactors = FALSE) 
+
 # ============================================================
 # 13. Result summary
 # ============================================================
@@ -234,14 +245,14 @@ print(
 
 write.table(
   rf_result,
-  file = "TWB1_RF_EAS_prediction.tsv.tsv",
+  file = "TWB1_RF_EAS_prediction.tsv",
   sep = "\t",
   quote = FALSE,
   row.names = FALSE
 )
 
 write.table(
-  eas,
+  eas_id,
   file = "TWB1_EAS.id",
   sep = "\t",
   quote = FALSE,

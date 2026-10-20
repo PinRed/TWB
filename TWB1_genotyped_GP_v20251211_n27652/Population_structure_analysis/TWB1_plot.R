@@ -42,7 +42,7 @@ rm(TWB1)
 # =========== TWB1 PCA =========== 
 
 twb1pca <- read.table(
-  "twb1_pca.eigenvec",
+  "meta_twb1_pca/TWB1_S05_pca.eigenvec",
   header = FALSE,
   stringsAsFactors = FALSE
 )

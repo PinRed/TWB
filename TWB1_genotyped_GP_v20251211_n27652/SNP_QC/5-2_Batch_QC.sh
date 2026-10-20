@@ -181,3 +181,8 @@ if [[ "${N_BATCH}" -lt 2 ]]; then
     echo "ERROR: At least two batches are required." >&2
     exit 1
 fi
+
+###########################################################
+# 6. Setting Permission denied
+###########################################################
+chmod -R 775 "${OUT_DIR}"

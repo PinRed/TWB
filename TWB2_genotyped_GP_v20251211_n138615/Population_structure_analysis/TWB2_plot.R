@@ -41,7 +41,7 @@ rm(TWB2)
 # =========== TWB2 PCA ===========
 
 twb2pca <- read.table(
-  "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis/TWB2_pca/TWB2_S05_pca.eigenvec",
+  "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis/meta_twb2_pca/TWB2_S05_pca.eigenvec",
   header = FALSE,
   stringsAsFactors = FALSE
 )

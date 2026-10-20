@@ -1,3 +1,25 @@
+# ==============================================================================
+# Pipeline Step: PC-AiR Analysis for Population Structure
+# Target Dataset: TWB1 East Asian (EAS) Cohort
+# 
+# Inputs:
+#   - TWB2_EAS.id (Target East Asian sample IDs)
+#   - TWB2_EAS_pcair_kin.kin0 (KING kinship coefficient table)
+#   - TWB2_EAS_pcair.gds (Genotype data in GDS format)
+#   - TWB2_EAS_pcair_prune.prune.in (LD-pruned SNP list)
+#
+# Outputs:
+#   - TWB2_EAS_pcair_fit.rds (Fitted PC-AiR object containing PCs and sample classifications)
+#
+# Workflow:
+#   1. Load sample IDs and construct a sparse kinship matrix (K) with self-kinship set to 0.5
+#   2. Read genotype GDS data and extract scan/SNP IDs
+#   3. Load and validate LD-pruned SNP list against the GDS database
+#   4. Align sample IDs across phenotypic/kinship and genotype datasets
+#   5. Execute PC-AiR (Principal Component Analysis in Related samples) via GENESIS
+#   6. Save the fitted PC-AiR model object
+# ==============================================================================
+
 
 library(data.table)
 library(Matrix)
@@ -113,6 +135,9 @@ K <- K[geno.ids, geno.ids]
 stopifnot(identical(rownames(K), geno.ids))
 stopifnot(identical(colnames(K), geno.ids))
 
+rm(pcair_snps)
+rm(geno.ids)
+rm(pruned_snps)
 # ============================================================
 # 6. Run PC-AiR
 # ============================================================
@@ -122,7 +147,8 @@ pcair_fit <- pcair(
   kinobj = K,
   divobj = NULL,
   kin.thresh = 2^(-11/2),
-  snp.include = gds_snp_ids
+  snp.include = gds_snp_ids,
+  num.cores = 24
 )
 
 # ============================================================
@@ -139,3 +165,7 @@ saveRDS(
   pcair_fit,
   file = "TWB2_EAS_pcair_fit.rds"
 )
+
+del(TWB2_EAS_pcair.gds)
+del(TWB2_EAS_pcair_prune.out)
+del(TWB2_EAS_pcair_prune.in)
