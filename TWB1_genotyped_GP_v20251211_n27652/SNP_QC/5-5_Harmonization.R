@@ -1,18 +1,18 @@
 library(Rsamtools)
 
-# Read 1000G Phase 3 GRCh38 SNP reference
+# Read 1000G Phase 3 GRCh37 SNP reference
 phase3_1kgp <- read.table(
-  "/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kGP/reference/1000G_Phase3_GRCh38_SNP.tsv",
+  "/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kgp/1kgp_hg19_QC_LD.bim",
   header = FALSE,
   stringsAsFactors = FALSE,
-  col.names = c("CHR", "BP", "ID", "REF", "ALT")
+  col.names = c("CHR", "ID", "GD", "BP", "ALT", "REF")
 )
 
 phase3_1kgp$CHR <- as.character(phase3_1kgp$CHR)
 phase3_1kgp$BP  <- as.integer(phase3_1kgp$BP)
 
-# GRCh38.fa
-ref_fa <- "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/SNP_QC/GRCh38_genome.fa"
+# GRCh37.fa
+ref_fa <- "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/SNP_QC/GRCh37_genome.fa"
 fa <- FaFile(ref_fa)
 open(fa)
 
@@ -202,12 +202,168 @@ result$PALINDROMIC <- with(
 result$PALINDROMIC[is.na(result$PALINDROMIC)] <- FALSE
 table(result$PALINDROMIC)
 
-# Export each classification
+# =================== Frequency ========================
+kgp_freq <- read.table(
+  "Freq/1KGP_EAS_freq.frq",
+  header = TRUE
+)
+
+twb_freq <- read.table(
+  "Freq/TWB_freq.frq",
+  header = TRUE
+)
+
+# =================== Prepare frequency ========================
+
+kgp_freq2 <- kgp_freq %>%
+  transmute(
+    CHR = as.character(CHR),
+    KGP_SNP = SNP,
+    KGP_A1 = A1,
+    KGP_A2 = A2,
+    KGP_FREQ = MAF,
+    KGP_NCHROBS = NCHROBS
+  )
+
+twb_freq2 <- twb_freq %>%
+  transmute(
+    CHR = as.character(CHR),
+    TWB_SNP = SNP,
+    TWB_A1_FREQ = A1,
+    TWB_A2_FREQ = A2,
+    TWB_FREQ = MAF,
+    TWB_NCHROBS = NCHROBS
+  )
+
+# =================== Merge ========================
+
+result_freq <- result %>%
+  mutate(CHR = as.character(CHR)) %>%
+  left_join(
+    twb_freq2 %>%
+      select(CHR, TWB_SNP, TWB_FREQ),
+    by = c("CHR", "ID.x" = "TWB_SNP")
+  ) %>%
+  left_join(
+    kgp_freq2 %>%
+      select(CHR, KGP_SNP, KGP_FREQ),
+    by = c("CHR", "ID.y" = "KGP_SNP")
+  )
+
+cat("Original SNP:", nrow(result), "\n")
+cat("Merged SNP:", nrow(result_freq), "\n")
+
+cat(
+  "TWB frequency matched:",
+  sum(!is.na(result_freq$TWB_FREQ)), "\n"
+)
+
+cat(
+  "KGP frequency matched:",
+  sum(!is.na(result_freq$KGP_FREQ)), "\n"
+)
+
+# =================== Frequency comparison ========================
+# Compare with 1kgp GRCh37 EAS freq
+
+threshold <- 0.05
+result_freq <- result_freq %>%
+  mutate(
+    FREQ_DIFF = abs(TWB_FREQ - KGP_FREQ),
+    
+    FREQ_DIFF_OPPOSITE = abs(TWB_FREQ - (1 - KGP_FREQ)),
+    
+    PAL_FREQ_STATUS = case_when(
+      !PALINDROMIC ~ "NON_PAL",
+      
+      is.na(TWB_FREQ) | is.na(KGP_FREQ) ~ "NO_FREQ",
+      
+      FREQ_DIFF < threshold &
+        FREQ_DIFF_OPPOSITE - FREQ_DIFF >= threshold ~
+        "SAME_SUPPORTED",
+      
+      FREQ_DIFF_OPPOSITE < threshold &
+        FREQ_DIFF - FREQ_DIFF_OPPOSITE >= threshold ~
+        "OPPOSITE_SUPPORTED",
+      
+      TRUE ~ "PAL_UNRESOLVED"
+    )
+  )
+
+# =================== Summary ========================
+
+table(result_freq$PAL_FREQ_STATUS)
+
+table(
+  result_freq$ALLELE_CLASS,
+  result_freq$PAL_FREQ_STATUS
+)
+
+table(
+  result_freq$PALINDROMIC,
+  result_freq$PAL_FREQ_STATUS
+)
+
+# =================== Export ========================
+
 write.table(
-  result,
-  file = paste0(out_file, "_allele_classification.tsv"),
+  result_freq,
+  paste0(out_file, "_frequency_comparison.tsv"),
   sep = "\t",
   quote = FALSE,
   row.names = FALSE
 )
 
+
+# ================ Result Status ======================
+library(dplyr)
+
+result_freq <- result_freq %>%
+  mutate(
+    REVIEW_STATUS = case_when(
+      
+      ALLELE_CLASS %in% c(
+        "NOT_IN_REFERENCE",
+        "UNRESOLVED_MISMATCH"
+      ) ~ "APPROVED_EXCLUDE",
+      
+      PAL_FREQ_STATUS %in% c(
+        "PAL_UNRESOLVED",
+        "NO_FREQ"
+      ) ~ "APPROVED_EXCLUDE",
+      
+      PAL_FREQ_STATUS == "SAME_SUPPORTED" ~
+        "APPROVED_PAL_KEEP",
+      
+      PAL_FREQ_STATUS == "NON_PAL" &
+        ALLELE_CLASS %in% c(
+          "MATCH",
+          "ALLELE_ORDER_SWAP"
+        ) ~ "APPROVED_KEEP",
+      
+      TRUE ~ "MANUAL_REVIEW"
+    )
+  )
+
+table(result_freq$REVIEW_STATUS)
+
+# Exclude SNP
+result_freq %>%
+  filter(REVIEW_STATUS == "APPROVED_EXCLUDE") %>%
+  distinct(ID.x) %>%
+  pull(ID.x) %>%
+  writeLines(paste0(out_dir,"approved_exclude.ids"))
+
+# Flip SNP
+result_freq %>%
+  filter(REVIEW_STATUS == "APPROVED_FLIP") %>%
+  distinct(ID.x) %>%
+  pull(ID.x) %>%
+  writeLines(paste0(out_dir,"approved_flip.ids"))
+
+# Palindromic keep
+result_freq %>%
+  filter(REVIEW_STATUS == "APPROVED_PAL_KEEP") %>%
+  distinct(ID.x) %>%
+  pull(ID.x) %>%
+  writeLines(paste0(out_dir,"approved_pal_keep.ids"))
