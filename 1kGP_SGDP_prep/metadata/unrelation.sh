@@ -1,0 +1,2 @@
+awk ' NR>1 && ($2!="0" || $3!="0") {print $1, $2, $3}' 1kGP.3202_samples.pedigree_info.txt > relation.txt
+awk 'NR==FNR {remove[$1]=1; next} FNR==1 || !($1 in remove)' relation.txt 1kGP.3202_samples.pedigree_info.txt > keep_unrelated_samples.txt
