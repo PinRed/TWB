@@ -18,9 +18,9 @@
 
 mkdir -p meta_twb1_pca
 
-onekgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kGP/1kgp_QC_LD"
-sdgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/SGDP/plink_output/sgdp_hg38_QC"
-twb1="TWB1_S05_hg38"
+onekgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kgp/1kgp_hg19_QC_LD"
+sdgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/SGDP/plink_output/sgdp_QC"
+twb1="../King/TWB1_S05"
 outdir="meta_twb1_pca"
 
 # Function to filter out strand-ambiguous SNPs (A/T and C/G alleles) to prevent strand alignment issues during merging

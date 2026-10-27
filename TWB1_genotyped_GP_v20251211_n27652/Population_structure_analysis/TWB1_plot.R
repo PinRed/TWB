@@ -27,7 +27,7 @@ noteas <- data.frame(
 # =========== TWB1 FAM =========== 
 setwd("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis")
 TWB1 <- read.delim(
-  "TWB1_S05_hg38.fam",
+  "../King/TWB1_S05.fam",
   header = FALSE,
   sep = "",
   quote = ""

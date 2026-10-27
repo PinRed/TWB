@@ -21,7 +21,7 @@ set -euo pipefail
 
 ARRAY="TWB1"
 
-INPUT="SNP_QC_FILE/TWB1_S06_hg38"
+INPUT="../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean"
 FINAL_SAMPLES="../Population_structure_analysis/${ARRAY}_EAS.id"
 OUTDIR="SNP_QC_temp"
 
