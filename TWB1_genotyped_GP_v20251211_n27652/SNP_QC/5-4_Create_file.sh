@@ -9,6 +9,7 @@ OUTDIR="SNP_QC_FILE/"
 plink2 \
   --bfile "${Input_BFILE}" \
   --exclude "${Exclude_SNPs}" \
+  --set-all-var-ids '@:#:$r:$a' \
   --make-bed \
   --out "${OUTDIR}${ARRAY}_F_SNPQC05_clean"
 

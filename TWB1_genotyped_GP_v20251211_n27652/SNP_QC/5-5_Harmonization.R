@@ -304,16 +304,6 @@ table(
   result_freq$PAL_FREQ_STATUS
 )
 
-# =================== Export ========================
-
-write.table(
-  result_freq,
-  paste0(out_file, "_frequency_comparison.tsv"),
-  sep = "\t",
-  quote = FALSE,
-  row.names = FALSE
-)
-
 
 # ================ Result Status ======================
 library(dplyr)
@@ -346,6 +336,36 @@ result_freq <- result_freq %>%
   )
 
 table(result_freq$REVIEW_STATUS)
+
+
+# Add Imputation QC SNP
+imput_snps_dir <- paste0(out_dir, "snps-excluded.txt")
+
+if (file.exists(imput_snps_dir)) {
+  imput_snps <- read.delim(
+    imput_snps_dir,
+    header = TRUE,
+    sep = "\t",
+    fill = TRUE,
+    check.names = FALSE
+  )
+  
+  result_freq[
+    result_freq$ID.x %in% imput_snps$`#Position`,
+    "REVIEW_STATUS"
+  ] <- "APPROVED_EXCLUDE"
+}
+
+# =================== Export ========================
+
+write.table(
+  result_freq,
+  paste0(out_file, "_frequency_comparison.tsv"),
+  sep = "\t",
+  quote = FALSE,
+  row.names = FALSE
+)
+
 
 # Exclude SNP
 result_freq %>%
