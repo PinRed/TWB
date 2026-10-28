@@ -38,7 +38,7 @@ This repository uses genomic data from the following datasets:
 
 Summary of genotype quality control (QC) procedures for Taiwan Biobank Phase 1 (TWB1) and Phase 2 (TWB2).
 
-| Step | TWB1 | TWB2 | QC Criteria / Notes | Output File |
+| Step | TWB1 Samples/SNPs | TWB2 Samples/SNPs | QC Criteria / Notes | Output File |
 |---|---|---|---|---|
 | **Original** | Samples: 27,652<br>SNPs: 646,973 | Samples: 138,615<br>SNPs: 686,370 | Raw genotype data | - |
 | **Primary Sample QC** | Samples: 27,323<br>SNPs: 646,973 | Samples: 136,984<br>SNPs: 646,973 | GCR, SEX, HET | - |
