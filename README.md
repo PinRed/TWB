@@ -239,22 +239,42 @@ Identify SNPs with potential batch effects.
 - SNP missingness difference > 0.02
 - Allele frequency difference > 0.10
 
+
 ## 9. Genotype Harmonization
 
-Perform genotype harmonization before imputation.
+Perform genotype harmonization before imputation to ensure allele consistency with the reference panel.
 
 ### Variant Categories
 
 - `APPROVED_EXCLUDE`
-- `NOT_IN_REFERENCE`
-- `UNRESOLVED_MISMATCH`
-  - A/T
-  - A/G
-- `PAL_UNRESOLVED`
-  - A/T or C/G >= 0.05
-- `APPROVED_PAL_KEEP`
-- `SAME_SUPPORTED`
-  - Frequency difference < 0.05
+  - `NOT_IN_REFERENCE`
+  - `UNRESOLVED_MISMATCH`
+  - `PALINDROMIC`
+- `APPROVED_FLIP`
+  - `STRAND_FLIP`
+- `APPROVED_KEEP`
+  - `MATCH`
+  - `ALLELE_ORDER_SWAP`
+
+### Harmonization Procedures
+
+- **Exclude variants:**
+  - Remove all palindromic SNPs (A/T and C/G).
+  - Remove SNPs with unresolved allele mismatches.
+  - Remove SNPs not present in the reference panel.
+
+- **Strand flipping:**
+  - Apply strand flipping to variants classified as `STRAND_FLIP`.
+  - Convert alleles to their complementary bases (A ↔ T, C ↔ G).
+
+- **Allele swapping:**
+  - Swap allele order for variants classified as `ALLELE_ORDER_SWAP`.
+  - Ensure allele orientation matches the reference panel.
+
+- **Retain variants:**
+  - Keep variants classified as `MATCH`.
+  - Keep successfully harmonized variants after strand flipping or allele swapping.
+
 
 ## 10. Genotype Imputation
 
@@ -263,17 +283,6 @@ Prepare genotype data for imputation.
 - Convert genotype data to VCF format.
 - Submit VCF files to the Taiwan Biobank Imputation Server.
 - Perform genotype imputation.
-
-
-## References
-
-- Taiwan Biobank (TWB)
-- 1000 Genomes Project (1KGP)
-- KING: Kinship and relatedness analysis
-- PCAiR: Principal Component Analysis in Related Samples
-- TWB 2022: LD pruning parameters
-- TPMI 2025: Population structure LD pruning parameters
-
 
 
 ## Quality Control Summary
