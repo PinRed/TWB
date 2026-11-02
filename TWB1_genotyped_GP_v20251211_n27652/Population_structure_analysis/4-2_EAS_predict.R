@@ -220,10 +220,16 @@ rf_result <- data.frame(
 )
 
 eas <- rf_result[rf_result$Final_classification == "EAS",]$IID
+no_eas <- rf_result[rf_result$Final_classification != "EAS",]$IID
 
 eas_id <- data.frame(
   IID = eas,
   FID = eas,
+  stringsAsFactors = FALSE) 
+
+no_eas_id <- data.frame(
+  IID = no_eas,
+  FID = no_eas,
   stringsAsFactors = FALSE) 
 
 # ============================================================
@@ -254,6 +260,15 @@ write.table(
 write.table(
   eas_id,
   file = "TWB1_EAS.id",
+  sep = "\t",
+  quote = FALSE,
+  row.names = FALSE,
+  col.names = FALSE
+)
+
+write.table(
+  no_eas_id,
+  file = "TWB1_NOT_EAS.id",
   sep = "\t",
   quote = FALSE,
   row.names = FALSE,

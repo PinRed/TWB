@@ -18,7 +18,7 @@
 
 mkdir -p meta_twb2_pca
 
-onekgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kGP/1kgp_QC_LD"
+onekgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kgp/1kgp_hg38_QC_LD"
 sdgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/SGDP/plink_output/sgdp_hg38_QC"
 twb2="../King/TWB2_S05"
 outdir="meta_twb2_pca"

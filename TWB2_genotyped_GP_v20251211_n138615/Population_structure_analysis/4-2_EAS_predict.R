@@ -212,6 +212,7 @@ rf_result <- data.frame(
 )
 
 eas <- rf_result[rf_result$Final_classification == "EAS",]$IID
+no_eas <- rf_result[rf_result$Final_classification != "EAS",]$IID
 
 # ============================================================
 # 13. Result summary
@@ -226,6 +227,7 @@ print(
 )
 
 eas_id <- data.frame(FID = eas, IID = eas)
+no_eas_id <- data.frame(FID = no_eas, IID = no_eas)
 
 
 # ============================================================
@@ -249,3 +251,11 @@ write.table(
   col.names = FALSE
 )
 
+write.table(
+  no_eas_id,
+  file = "TWB2_NOT_EAS.id",
+  sep = "\t",
+  quote = FALSE,
+  row.names = FALSE,
+  col.names = FALSE
+)
