@@ -58,53 +58,8 @@ This repository uses genomic data from the following datasets:
 
 This repository documents the genotype quality control (QC) workflow for Taiwan Biobank (TWB) data.
 
-```text
-Raw TWB Genotype Data
-          |
-          v
-    Primary Sample QC
-    (GCR, SEX, HET)
-          |
-          v
-     Primary SNP QC
-          |
-          v
-    KING Relatedness
-          |
-          v
-         PCAiR
-          |
-          v
-   Population Structure
-          |
-          v
- Random Forest EAS Classification
-          |
-          v
-     EAS Sample Selection
-       P(EAS) >= 0.8
-          |
-          v
-    Batch-Level SNP QC
-          |
-          v
-  EAS Population Structure
-          |
-          v
-       Final SNP QC
-          |
-          v
-    Batch Effect SNP QC
-          |
-          v
-      Harmonization
-          |
-          v
-      VCF Conversion
-          |
-          v
-   TWB Imputation Server
-```
+![image](https://github.com/PinRed/TWB/blob/main/Figure/QC_workflow_1.jpg)
+![image](https://github.com/PinRed/TWB/blob/main/Figure/QC_workflow_2.jpg)
 
 ## 1. Primary Sample QC
 
