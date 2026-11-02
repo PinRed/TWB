@@ -58,16 +58,53 @@ This repository uses genomic data from the following datasets:
 
 This repository documents the genotype quality control (QC) workflow for Taiwan Biobank (TWB) data.
 
-The pipeline includes:
-
-- Sample quality control
-- SNP quality control
-- Relatedness and kinship analysis
-- Population structure analysis
-- Batch effect quality control
-- Genetic ancestry classification
-- Genotype harmonization
-- Genotype imputation
+```text
+Raw TWB Genotype Data
+          |
+          v
+    Primary Sample QC
+    (GCR, SEX, HET)
+          |
+          v
+     Primary SNP QC
+          |
+          v
+    KING Relatedness
+          |
+          v
+         PCAiR
+          |
+          v
+   Population Structure
+          |
+          v
+ Random Forest EAS Classification
+          |
+          v
+     EAS Sample Selection
+       P(EAS) >= 0.8
+          |
+          v
+    Batch-Level SNP QC
+          |
+          v
+  EAS Population Structure
+          |
+          v
+       Final SNP QC
+          |
+          v
+    Batch Effect SNP QC
+          |
+          v
+      Harmonization
+          |
+          v
+      VCF Conversion
+          |
+          v
+   TWB Imputation Server
+```
 
 ## 1. Primary Sample QC
 
@@ -227,55 +264,6 @@ Prepare genotype data for imputation.
 - Submit VCF files to the Taiwan Biobank Imputation Server.
 - Perform genotype imputation.
 
-## 11. Workflow Summary
-
-```text
-Raw TWB Genotype Data
-          |
-          v
-    Primary Sample QC
-    (GCR, SEX, HET)
-          |
-          v
-     Primary SNP QC
-          |
-          v
-    KING Relatedness
-          |
-          v
-         PCAiR
-          |
-          v
-   Population Structure
-          |
-          v
- Random Forest EAS Classification
-          |
-          v
-     EAS Sample Selection
-       P(EAS) >= 0.8
-          |
-          v
-    Batch-Level SNP QC
-          |
-          v
-  EAS Population Structure
-          |
-          v
-       Final SNP QC
-          |
-          v
-    Batch Effect SNP QC
-          |
-          v
-      Harmonization
-          |
-          v
-      VCF Conversion
-          |
-          v
-   TWB Imputation Server
-```
 
 ## References
 
