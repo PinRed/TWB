@@ -22,17 +22,271 @@ This repository uses genomic data from the following datasets:
   - Data release: `20130502`
   - Download: [1000 Genomes GRCh37](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/)
 - **GRCh38**
-  - Data collection: `1000G_2504_high_coverage`
+  - Download VCF from [1000 Genomes GRCh38](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/)
   - Phased dataset: `20201028_3202_phased`
-  - Download: [1000 Genomes GRCh38](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/)
+- SNP data 
+  - Format: PLINK binary fileset
+  - Sample: unrelated samples (Refer to 1kGP.3202_samples.pedigree_info.txt ([download](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/))) for additional information
+  - Autosome (chr1~chr22)
+  - Exclusions: SNPs in high linkage disequilibrium (LD) regions ([download](https://genome.sph.umich.edu/wiki/Regions_of_high_linkage_disequilibrium_(LD)))
+
 
 ## 3. Simons Genome Diversity Project (SGDP)
 
 - **GRCh37**
-  - Data format: `VCF`
-  - Download: [SGDP VCF Variants](https://sharehost.hms.harvard.edu/genetics/reich_lab/sgdp/vcf_variants/)
+  - Download VCF from [SGDP VCF Variants](https://sharehost.hms.harvard.edu/genetics/reich_lab/sgdp/vcf_variants/)
+
+- **GRCh38**
+  - LiftOver 
+
+- SNP data
+  - Format: PLINK binary filest
+  - Sample: Oceania, EastAsia, SouthAsia
+  - Autosome (chr1~chr22)
+- Sample information: 
+  SGDP_metadata.279publiu.21signedLetter.44Fan.samples.txt ([download](https://sharehost.hms.harvard.edu/genetics/reich_lab/sgdp/SGDP_metadata.279public.21signedLetter.44Fan.samples.txt))
  
-# TWB Genotype Quality Control Pipeline
+# Repository Structure
+- 1kGP_SGDP_prep/ — Reference-data preparation directory.
+- TWB1_genotyped_GP_v20251211_n27652/ — TWB1 genotype-processing directory.
+- TWB2_genotyped_GP_v20251211_n138615/ — TWB2 genotype-processing directory.
+
+
+# Taiwan Biobank (TWB) Genotype Quality Control Pipeline
+
+## Overview
+
+This repository documents the genotype quality control (QC) workflow for Taiwan Biobank (TWB) data.
+
+The pipeline includes:
+
+- Sample quality control
+- SNP quality control
+- Relatedness and kinship analysis
+- Population structure analysis
+- Batch effect quality control
+- Genetic ancestry classification
+- Genotype harmonization
+- Genotype imputation
+
+## 1. Primary Sample QC
+
+Perform initial sample-level quality control.
+
+- Genotype Call Rate (GCR)
+- Sex concordance (SEX)
+- Heterozygosity (HET)
+
+**Output:**
+- `TWB_S03_all_QC`
+
+## 2. Primary SNP QC
+
+Perform initial SNP-level quality control.
+
+- Structural variant filtering
+- Minor Allele Frequency (MAF = 0)
+- SNP missingness < 98%
+
+**Output:**
+- `TWB_S03_all_QC_clean`
+
+## 3. Relatedness and Kinship Analysis
+
+### KING
+
+Identify genetic relationships between samples.
+
+- SNP QC:
+  - MAF > 5%
+  - GCR < 99%
+- LD pruning:
+  - Window size: 5000 kb
+  - LD threshold: 0.3
+  - Reference: TWB 2022
+- Kinship threshold:
+  - Kinship > 0.0084
+- Generate kinship matrix.
+
+### PCAiR
+
+Perform principal component analysis accounting for relatedness.
+
+- Identify related samples.
+- Identify unrelated samples.
+- Perform PCAiR analysis.
+
+## 4. Population Structure Analysis
+
+Evaluate population structure using TWB and 1000 Genomes Project (1KGP) reference data.
+
+### Preprocessing
+
+- Filter related samples.
+- Filter batch-effect SNPs.
+- Remove high-LD regions.
+- Extract common SNPs between 1KGP and TWB (hg38).
+- Remove non-strand-ambiguous SNPs, as specified in the workflow.
+
+### LD Pruning
+
+- Window size: 1000
+- Step size: 1
+- LD threshold: 0.1
+- Reference: TPMI 2025
+
+### Principal Component Analysis
+
+- Perform PCA.
+- Evaluate population structure.
+- Identify East Asian (EAS) ancestry samples.
+
+## 5. Genetic Ancestry Classification
+
+Classify samples using a Random Forest model.
+
+- Train a Random Forest classifier.
+- Estimate East Asian ancestry probability.
+- Remove samples with:
+  - P(EAS) < 0.8
+- Retain EAS samples for downstream analyses.
+
+## 6. Batch-Level SNP QC
+
+Perform quality control for each genotyping batch.
+
+### Missingness Filtering
+
+- SNP missing rate > 10%
+- Individual missing rate > 10%
+- SNP missing rate > 5%
+
+### Batch Comparison
+
+- Calculate SNP missingness.
+- Calculate allele frequency.
+- Identify common SNPs across all batches.
+- Generate SNP intersection across batches.
+
+## 7. EAS Population Structure Analysis
+
+Perform population structure analysis using selected EAS samples.
+
+- Extract EAS samples.
+- Filter batch-effect SNPs.
+- Apply SNP QC:
+  - MAF > 5%
+  - GCR < 99%
+- Perform LD pruning:
+  - Window size: 5000 kb
+  - LD threshold: 0.3
+  - Reference: TWB 2022
+- Perform PCAiR analysis.
+
+## 8. Final SNP QC
+
+Perform SNP quality control using the final EAS sample set.
+
+### SNP Filtering
+
+- Extract final EAS samples.
+- SNP missingness < 98%
+- MAF = 0
+- Hardy-Weinberg Equilibrium:
+  - HWE < 1e-6
+
+### Batch Effect SNP QC
+
+Identify SNPs with potential batch effects.
+
+- SNP missingness difference > 0.02
+- Allele frequency difference > 0.10
+
+## 9. Genotype Harmonization
+
+Perform genotype harmonization before imputation.
+
+### Variant Categories
+
+- `APPROVED_EXCLUDE`
+- `NOT_IN_REFERENCE`
+- `UNRESOLVED_MISMATCH`
+  - A/T
+  - A/G
+- `PAL_UNRESOLVED`
+  - A/T or C/G >= 0.05
+- `APPROVED_PAL_KEEP`
+- `SAME_SUPPORTED`
+  - Frequency difference < 0.05
+
+## 10. Genotype Imputation
+
+Prepare genotype data for imputation.
+
+- Convert genotype data to VCF format.
+- Submit VCF files to the Taiwan Biobank Imputation Server.
+- Perform genotype imputation.
+
+## 11. Workflow Summary
+
+```text
+Raw TWB Genotype Data
+          |
+          v
+    Primary Sample QC
+    (GCR, SEX, HET)
+          |
+          v
+     Primary SNP QC
+          |
+          v
+    KING Relatedness
+          |
+          v
+         PCAiR
+          |
+          v
+   Population Structure
+          |
+          v
+ Random Forest EAS Classification
+          |
+          v
+     EAS Sample Selection
+       P(EAS) >= 0.8
+          |
+          v
+    Batch-Level SNP QC
+          |
+          v
+  EAS Population Structure
+          |
+          v
+       Final SNP QC
+          |
+          v
+    Batch Effect SNP QC
+          |
+          v
+      Harmonization
+          |
+          v
+      VCF Conversion
+          |
+          v
+   TWB Imputation Server
+```
+
+## References
+
+- Taiwan Biobank (TWB)
+- 1000 Genomes Project (1KGP)
+- KING: Kinship and relatedness analysis
+- PCAiR: Principal Component Analysis in Related Samples
+- TWB 2022: LD pruning parameters
+- TPMI 2025: Population structure LD pruning parameters
+
+
 
 ## Quality Control Summary
 
