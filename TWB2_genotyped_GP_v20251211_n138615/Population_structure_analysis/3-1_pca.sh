@@ -7,8 +7,8 @@
 #   - 1KGP, SGDP, and TWB2 PLINK binary files (.bed, .bim, .fam)
 #
 # Outputs:
-#   - TWB2_S05_pca.{bed,bim,fam}: Merged, filtered, and LD-pruned dataset
-#   - TWB2_S05_pca.eigenvec / eigenval: PCA results (first 20 PCs)
+#   - ${ARRAY}_S03_all_QC_clean.{bed,bim,fam}: Merged, filtered, and LD-pruned dataset
+#   - ${ARRAY}_S04_pca.eigenvec / eigenval: PCA results (first 20 PCs)
 # Do :
 #  1. Filter out strand-ambiguous SNPs (A/T and C/G alleles)
 #  2. Merge the filtered datasets and catch common SNPs
@@ -18,10 +18,17 @@
 
 mkdir -p meta_twb2_pca
 
+ARRAY="TWB2"
 onekgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kgp/1kgp_hg38_QC_LD"
 sdgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/SGDP/plink_output/sgdp_hg38_QC"
-twb2="../King/TWB2_S05"
 outdir="meta_twb2_pca"
+twb2="${outdir}/${ARRAY}_S03"
+
+plink2 \
+  --bfile "../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean" \
+  --set-all-var-ids '@:#:$r:$a' \
+  --make-bed \
+  --out "${twb2}"
 
 # Function to filter out strand-ambiguous SNPs (A/T and C/G alleles) to prevent strand alignment issues during merging
 filter_ambiguous() {
@@ -40,13 +47,13 @@ echo "=========================================="
 echo "Finding common non-ambiguous SNPs across cohorts"
 echo "=========================================="
 
-filter_ambiguous "${onekgp}.bim" | sort -u > 1kg.snps
-filter_ambiguous "${sdgp}.bim"   | sort -u > sdgp.snps
-filter_ambiguous "${twb2}.bim"   | sort -u > twb2.snps
+filter_ambiguous "${onekgp}.bim" | sort -u > ${outdir}/1kg.snps
+filter_ambiguous "${sdgp}.bim"   | sort -u > ${outdir}/sdgp.snps
+filter_ambiguous "${twb2}.bim"   | sort -u > ${outdir}/twb2.snps
 
 # Find intersection of SNPs present in all three datasets
-comm -12 1kg.snps sdgp.snps > tmp.pos
-comm -12 tmp.pos twb2.snps > "${outdir}/common.pos"
+comm -12 ${outdir}/1kg.snps ${outdir}/sdgp.snps > ${outdir}/tmp.pos
+comm -12 ${outdir}/tmp.pos ${outdir}/twb2.snps > "${outdir}/common.pos"
 
 echo "Common SNPs count:"
 wc -l "${outdir}/common.pos"
@@ -105,7 +112,7 @@ plink \
 ############################################################
 
 echo "=========================================="
-echo "LD pruning"
+echo "Step 4: LD pruning"
 echo "=========================================="
 
 plink \
@@ -119,14 +126,14 @@ plink \
 ############################################################
 
 echo "=========================================="
-echo "Extracting LD-pruned SNPs"
+echo "Step 5: Extracting LD-pruned SNPs"
 echo "=========================================="
 
 plink \
   --bfile "${outdir}/all_common" \
   --extract "${outdir}/TWB2_for_pca.prune.in" \
   --make-bed \
-  --out "${outdir}/TWB2_S05_pca"
+  --out "${outdir}/TWB2_S04_pca"
 
 
 ############################################################
@@ -138,9 +145,9 @@ echo "Step 6: Running PCA"
 echo "=========================================="
 
 plink2 \
-  --bfile "${outdir}/TWB2_S05_pca" \
+  --bfile "${outdir}/TWB2_S04_pca" \
   --pca 20 approx \
-  --out "${outdir}/TWB2_S05_pca"
+  --out "${outdir}/TWB2_S04_pca"
 
 
 ############################################################
@@ -153,14 +160,14 @@ echo "PCA completed successfully!"
 echo "=========================================="
 
 echo "Final BED files:"
-echo "${outdir}/TWB2_S05_pca.bed"
-echo "${outdir}/TWB2_S05_pca.bim"
-echo "${outdir}/TWB2_S05_pca.fam"
+echo "${outdir}/TWB2_S04_pca.bed"
+echo "${outdir}/TWB2_S04_pca.bim"
+echo "${outdir}/TWB2_S04_pca.fam"
 
 echo ""
 echo "PCA results:"
-echo "${outdir}/TWB2_S05_pca.eigenvec"
-echo "${outdir}/TWB2_S05_pca.eigenval"
+echo "${outdir}/TWB2_S04_pca.eigenvec"
+echo "${outdir}/TWB2_S04_pca.eigenval"
 
 echo "=========================================="
 echo "Variant Count Summary"
@@ -210,189 +217,6 @@ rm -f \
   "${outdir}/all_common.nosex"
 
 # Remove intermediate LD pruning files
-rm -f \
-  "${outdir}/TWB2_for_pca.prune.in" \
-  "${outdir}/TWB2_for_pca.prune.out" \
-  "${outdir}/TWB2_for_pca.log" \
-  "${outdir}/TWB2_for_pca.nosex"
-mkdir -p meta_twb2_pca
-
-onekgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kGP/1kgp_QC_LD"
-sdgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/SGDP/plink_output/sgdp_hg38_QC"
-twb2="../King/TWB2_S05"
-outdir="meta_twb2_pca"
-
-filter_ambiguous() {
-  awk '
-  !(( ($5=="A") && ($6=="T") ) || \
-    ( ($5=="T") && ($6=="A") ) || \
-    ( ($5=="C") && ($6=="G") ) || \
-    ( ($5=="G") && ($6=="C") )) { print $2 }' "$1"
-}
-
-# 抓取非 Strand Ambiguous 的位點並排序
-filter_ambiguous "${onekgp}.bim" | sort -u > 1kg.snps
-filter_ambiguous "${sdgp}.bim"   | sort -u > sdgp.snps
-filter_ambiguous "${twb2}.bim"   | sort -u > twb2.snps
-
-
-comm -12 1kg.snps sdgp.snps > tmp.pos
-comm -12 tmp.pos twb2.snps > common.pos
-
-echo "Common SNPs:"
-wc -l "${outdir}/common.pos"
-
-plink \
-  --bfile "${onekgp}" \
-  --extract "${outdir}/common.pos" \
-  --make-bed \
-  --out "${outdir}/1kg_common"
-
-plink \
-  --bfile "${sdgp}" \
-  --extract "${outdir}/common.pos" \
-  --make-bed \
-  --out "${outdir}/sgdp_common"
-
-plink \
-  --bfile "${twb2}" \
-  --extract "${outdir}/common.pos" \
-  --make-bed \
-  --out "${outdir}/TWB2_common"
-
-
-echo "=========================================="
-echo "Merge datasets"
-echo "=========================================="
-
-cat > "${outdir}/merge_common.list" << EOF
-${outdir}/sgdp_common.bed ${outdir}/sgdp_common.bim ${outdir}/sgdp_common.fam
-${outdir}/TWB2_common.bed ${outdir}/TWB2_common.bim ${outdir}/TWB2_common.fam
-EOF
-
-
-
-plink \
-  --bfile "${outdir}/1kg_common" \
-  --merge-list "${outdir}/merge_common.list" \
-  --make-bed \
-  --out "${outdir}/all_common"
-
-
-############################################################
-# Step 4. LD pruning
-############################################################
-
-echo "=========================================="
-echo "LD pruning"
-echo "=========================================="
-
-plink \
-  --bfile "${outdir}/all_common" \
-  --indep-pairwise 1000 1 0.1 \
-  --out "${outdir}/TWB2_for_pca"
-
-
-############################################################
-# Step 5. Extract LD-pruned SNPs
-############################################################
-
-echo "=========================================="
-echo "Extract LD-pruned SNPs"
-echo "=========================================="
-
-plink \
-  --bfile "${outdir}/all_common" \
-  --extract "${outdir}/TWB2_for_pca.prune.in" \
-  --make-bed \
-  --out "${outdir}/TWB2_S05_pca"
-
-
-############################################################
-# Step 6. PCA
-############################################################
-
-echo "=========================================="
-echo "Step 6: PCA"
-echo "=========================================="
-
-plink2 \
-  --bfile "${outdir}/TWB2_S05_pca" \
-  --pca 20 approx \
-  --out "${outdir}/TWB2_S05_pca"
-
-
-############################################################
-# Finished
-############################################################
-
-echo ""
-echo "=========================================="
-echo "PCA completed!"
-echo "=========================================="
-
-echo "Final BED files:"
-echo "${outdir}/TWB2_S05_pca.bed"
-echo "${outdir}/TWB2_S05_pca.bim"
-echo "${outdir}/TWB2_S05_pca.fam"
-
-echo ""
-echo "PCA results:"
-echo "${outdir}/TWB2_S05_pca.eigenvec"
-echo "${outdir}/TWB2_S05_pca.eigenval"
-
-echo "=========================================="
-echo "Each Step Number of SNPs"
-echo "=========================================="
-
-
-printf "All common SNPs:     "
-wc -l < "${outdir}/common.pos"
-
-printf "LD SNPs:     "
-wc -l < "${outdir}/TWB2_for_pca.prune.in"
-
-############################################################
-# Cleanup
-############################################################
-
-echo "=========================================="
-echo "Cleanup intermediate files"
-echo "=========================================="
-
-# Step 1: SNP lists
-#rm -f \
-#  "${outdir}/common.pos"
-
-# Step 2: Common datasets
-rm -f \
-  "${outdir}/1kg_common.bed" \
-  "${outdir}/1kg_common.bim" \
-  "${outdir}/1kg_common.fam" \
-  "${outdir}/1kg_common.log" \
-  "${outdir}/1kg_common.nosex" \
-  "${outdir}/sdgp_common.bed" \
-  "${outdir}/sdgp_common.bim" \
-  "${outdir}/sdgp_common.fam" \
-  "${outdir}/sdgp_common.log" \
-  "${outdir}/sdgp_common.nosex" \
-  "${outdir}/TWB2_common.bed" \
-  "${outdir}/TWB2_common.bim" \
-  "${outdir}/TWB2_common.fam" \
-  "${outdir}/TWB2_common.log" \
-  "${outdir}/TWB2_common.nosex"\
-  "${outdir}/tmp.pos" \
-
-# Step 3: Merge files
-rm -f \
-  "${outdir}/merge_common.list" \
-  "${outdir}/all_common.bed" \
-  "${outdir}/all_common.bim" \
-  "${outdir}/all_common.fam" \
-  "${outdir}/all_common.log" \
-  "${outdir}/all_common.nosex"
-
-# Step 4: LD pruning files
 rm -f \
   "${outdir}/TWB2_for_pca.prune.in" \
   "${outdir}/TWB2_for_pca.prune.out" \

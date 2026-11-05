@@ -1,14 +1,14 @@
 #!/bin/bash
 # ==============================================================================
 # Pipeline Step: TWB2 Familial Relatedness Check
-# Target Dataset: TWB1 cohort
+# Target Dataset: TWB2 cohort
 # Inputs:
-#   - TWB1_S03_all_QC_clean.{bed,bim,fam} (TWB1 dataset after SNP QC)
+#   - TWB2_S03_all_QC_clean.{bed,bim,fam} (TWB2 dataset after SNP QC)
 # Outputs:
-#   - TWB1_S04_qc.{bed,bim,fam} (TWB1 dataset after QC for relatedness check)
-#   - TWB1_S04_prune.{bed,bim,fam} (TWB1 dataset after LD pruning)
-#   - TWB1_S04_duplicate.kin0 (KING duplicate check results)
-#   - TWB1_relatedness_deg2plus.kin0 (KING relatedness check results for 2nd degree relatives)
+#   - TWB2_S04_qc.{bed,bim,fam} (TWB2 dataset after QC for relatedness check)
+#   - TWB2_S04_prune.{bed,bim,fam} (TWB2 dataset after LD pruning)
+#   - TWB2_S04_duplicate.kin0 (KING duplicate check results)
+#   - TWB2_relatedness_deg2plus.kin0 (KING relatedness check results for 2nd degree relatives)
 # Workflow:
 #   1. Perform QC on the dataset for relatedness check missingness > 0.01 and  MAF > 0.05
 #   2. Perform LD pruning to reduce SNP redundancy 5000kb 1 0.2
@@ -23,13 +23,11 @@
 # Step 3: KING duplicate check
 # Step 4: KING relatedness check
 
-ARRAY=TWB1
+ARRAY=TWB2
+input="$../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean"
 
-# SNP QC
-# geno 0.02
-# maf 0.05
 plink2 \
-  --bfile ../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean \
+  --bfile ${input} \
   --geno 0.01 \
   --maf 0.05 \
   --make-bed \
@@ -47,8 +45,6 @@ plink2 \
   --make-bed \
   --out ${ARRAY}_S04_ldpruned 
 
-# 2. 提取近親與重複樣本 (Kinship > 0.354 表示近乎 Duplicate/MZ twins)
-# KING 預設產出 duplicate 報告
 king -b ${ARRAY}_S04_ldpruned.bed \
      --duplicate \
      --prefix ${ARRAY}_S04_duplicate
@@ -62,6 +58,3 @@ plink2 --bfile ${ARRAY}_S04_ldpruned \
 # 解壓縮
 zstd -d ${ARRAY}_relatedness_deg2plus.kin0.zst \
      -o ${ARRAY}_relatedness_deg2plus.kin0
-
-
-# Run TWB2_Familial_Relatedness.R

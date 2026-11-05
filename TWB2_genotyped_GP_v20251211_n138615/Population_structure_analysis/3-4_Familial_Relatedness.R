@@ -1,14 +1,14 @@
 #!/bin/bash
 # ===============================================================================
 # Pipeline Step: Familial relatedness / highly similar genomes
-# Target Dataset: TWB1 cohort
+# Target Dataset: TWB2 cohort
 # Inputs:
-#   - TWB1_S04_ldpruned.{bed,bim,fam}: LD-pruned genotype data for relatedness check
-#   - TWB1_relatedness_deg2plus.kin0: KING relatedness check results for 2nd degree relatives
+#   - TWB2_S04_ldpruned.{bed,bim,fam}: LD-pruned genotype data for relatedness check
+#   - TWB2_relatedness_deg2plus.kin0: KING relatedness check results for 2nd degree relatives
 # Outputs:
-#   - TWB1.PCAiR.tsv: PCA results from PC-AiR
-#   - TWB1.relatedsamples.tsv: List of related samples identified by PC-AiR
-#   - TWB1.unrelatedsamples.tsv: List of unrelated samples identified by PC-AiR
+#   - TWB2.PCAiR.tsv: PCA results from PC-AiR
+#   - TWB2.relatedsamples.tsv: List of related samples identified by PC-AiR
+#   - TWB2.unrelatedsamples.tsv: List of unrelated samples identified by PC-AiR
 # Workflow:
 #   1. Read KING output and convert to matrix format(.gds)
 #   2. Check sample IDs and reorder KING matrix to match genotype data
@@ -20,22 +20,27 @@
 library(GENESIS)
 library(GWASTools)
 library(SNPRelate)
+library(Matrix)
 
-## ==== TWB1 ====
+## ======== TWB2 ========
+path2 = "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis"
+setwd(path2)
 
-setwd("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/King")
+
+
+### ============ 轉換KingToMatrix格式 ============
+
 kin <- read.table(
-  "TWB1_relatedness_deg2plus.kin0",
+  "TWB2_relatedness_deg2plus.kin0",
   header = TRUE,
   comment.char = "",
   stringsAsFactors = FALSE
 )
-
 colnames(kin)[1:4] <- c("ID1", "ID2", "NSNP", "Kinship")
 
 write.table(
   kin,
-  "TWB1_relatedness_deg2plus.king",
+  "TWB2_relatedness_deg2plus.king",
   sep = "\t",
   quote = FALSE,
   row.names = FALSE,
@@ -46,13 +51,13 @@ write.table(
 ### ============ 1. Read KING output ============
 
 
+# 38,920 samples
 KINGmat <- kingToMatrix(
-  "TWB1_relatedness_deg2plus.king",
+  "TWB2_relatedness_deg2plus.king",
   estimator = "Kinship",
   verbose = TRUE
 )
 
-# 4042
 cat("KING matrix dimensions:",
     paste(dim(KINGmat), collapse = " x "), "\n")
 
@@ -61,10 +66,10 @@ cat("Non-zero entries:",
 
 ### ============ 2. Read genotype ============
 
-snpgdsBED2GDS(bed.fn = "TWB1_S04_ldpruned.bed", bim.fn = "TWB1_S04_ldpruned.bim", fam.fn = "TWB1_S04_ldpruned.fam", out.gdsfn = "TWB1_S04_ldpruned.gds")
+snpgdsBED2GDS(bed.fn = "TWB2_S04_ldpruned.bed", bim.fn = "TWB2_S04_ldpruned.bim", fam.fn = "TWB2_S04_ldpruned.fam", out.gdsfn = "TWB2_S04_ldpruned.gds")
 
 geno <- GdsGenotypeReader(
-  filename = "TWB1_S04_ldpruned.gds"
+  filename = "TWB2_S04_ldpruned.gds"
 )
 
 genoData <- GenotypeData(geno)
@@ -121,7 +126,7 @@ colnames(mypcair$vectors) <-
 
 write.table(
   mypcair$vectors,
-  file = "TWB1_filter.PCAiR",
+  file = "TWB2.PCAiR.tsv",
   col.names = NA,
   row.names = TRUE,
   sep = "\t",
@@ -130,7 +135,7 @@ write.table(
 
 write.table(
   mypcair$rels,
-  file = "TWB1_filter.relatedsamples",
+  file = "TWB2.relatedsamples.tsv",
   col.names = TRUE,
   row.names = FALSE,
   sep = "\t",
@@ -139,11 +144,9 @@ write.table(
 
 write.table(
   mypcair$unrels,
-  file = "TWB1_filter.unrelatedsamples",
+  file = "TWB2.unrelatedsamples.tsv",
   col.names = TRUE,
   row.names = FALSE,
   sep = "\t",
   quote = FALSE
 )
-
-

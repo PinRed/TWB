@@ -22,7 +22,7 @@ set -euo pipefail
 ARRAY="TWB1"
 
 INPUT="../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean"
-FINAL_SAMPLES="../Population_structure_analysis/${ARRAY}_EAS.id"
+FINAL_SAMPLES="../Population_structure_analysis/${ARRAY}_unrelated_keep.id"
 OUTDIR="SNP_QC_temp"
 
 mkdir -p "${OUTDIR}"

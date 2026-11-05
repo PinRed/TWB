@@ -7,8 +7,8 @@
 #   - 1KGP, SGDP, and TWB1 PLINK binary files (.bed, .bim, .fam)
 #
 # Outputs:
-#   - TWB1_S05_pca.{bed,bim,fam}: Merged, filtered, and LD-pruned dataset
-#   - TWB1_S05_pca.eigenvec / eigenval: PCA results (first 20 PCs)
+#   - TWB1_S04_pca.{bed,bim,fam}: Merged, filtered, and LD-pruned dataset
+#   - TWB1_S04_pca.eigenvec / eigenval: PCA results (first 20 PCs)
 # Do :
 #  1. Filter out strand-ambiguous SNPs (A/T and C/G alleles)
 #  2. Merge the filtered datasets and catch common SNPs
@@ -18,10 +18,17 @@
 
 mkdir -p meta_twb1_pca
 
+ARRAY="TWB1"
 onekgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/1kgp/1kgp_hg19_QC_LD"
 sdgp="/SATA2TB/Taiwan_Biobank/1kGP_SGDP_prep/SGDP/plink_output/sgdp_QC"
-twb1="../King/TWB1_S05"
 outdir="meta_twb1_pca"
+twb1="${outdir}/${ARRAY}_S03"
+
+plink2 \
+  --bfile "../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean" \
+  --set-all-var-ids '@:#:$r:$a' \
+  --make-bed \
+  --out "${twb1}"
 
 # Function to filter out strand-ambiguous SNPs (A/T and C/G alleles) to prevent strand alignment issues during merging
 filter_ambiguous() {
@@ -40,13 +47,13 @@ echo "=========================================="
 echo "Finding common non-ambiguous SNPs across cohorts"
 echo "=========================================="
 
-filter_ambiguous "${onekgp}.bim" | sort -u > 1kg.snps
-filter_ambiguous "${sdgp}.bim"   | sort -u > sdgp.snps
-filter_ambiguous "${twb1}.bim"   | sort -u > twb1.snps
+filter_ambiguous "${onekgp}.bim" | sort -u > ${outdir}/1kg.snps
+filter_ambiguous "${sdgp}.bim"   | sort -u > ${outdir}/sdgp.snps
+filter_ambiguous "${twb1}.bim"   | sort -u > ${outdir}/twb1.snps
 
 # Find intersection of SNPs present in all three datasets
-comm -12 1kg.snps sdgp.snps > tmp.pos
-comm -12 tmp.pos twb1.snps > "${outdir}/common.pos"
+comm -12 ${outdir}/1kg.snps ${outdir}/sdgp.snps > ${outdir}/tmp.pos
+comm -12 ${outdir}/tmp.pos ${outdir}/twb1.snps > ${outdir}/common.pos
 
 echo "Common SNPs count:"
 wc -l "${outdir}/common.pos"
@@ -126,7 +133,7 @@ plink \
   --bfile "${outdir}/all_common" \
   --extract "${outdir}/TWB1_for_pca.prune.in" \
   --make-bed \
-  --out "${outdir}/TWB1_S05_pca"
+  --out "${outdir}/TWB1_S04_pca"
 
 
 ############################################################
@@ -138,9 +145,9 @@ echo "Step 6: Running PCA"
 echo "=========================================="
 
 plink2 \
-  --bfile "${outdir}/TWB1_S05_pca" \
+  --bfile "${outdir}/TWB1_S04_pca" \
   --pca 20 approx \
-  --out "${outdir}/TWB1_S05_pca"
+  --out "${outdir}/TWB1_S04_pca"
 
 
 ############################################################
@@ -153,14 +160,14 @@ echo "PCA completed successfully!"
 echo "=========================================="
 
 echo "Final BED files:"
-echo "${outdir}/TWB1_S05_pca.bed"
-echo "${outdir}/TWB1_S05_pca.bim"
-echo "${outdir}/TWB1_S05_pca.fam"
+echo "${outdir}/TWB1_S04_pca.bed"
+echo "${outdir}/TWB1_S04_pca.bim"
+echo "${outdir}/TWB1_S04_pca.fam"
 
 echo ""
 echo "PCA results:"
-echo "${outdir}/TWB1_S05_pca.eigenvec"
-echo "${outdir}/TWB1_S05_pca.eigenval"
+echo "${outdir}/TWB1_S04_pca.eigenvec"
+echo "${outdir}/TWB1_S04_pca.eigenval"
 
 echo "=========================================="
 echo "Variant Count Summary"

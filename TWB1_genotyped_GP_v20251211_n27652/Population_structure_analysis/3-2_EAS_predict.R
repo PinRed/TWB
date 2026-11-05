@@ -1,9 +1,9 @@
 # ============================================================
 # Random Forest classification
 # Training : 1KGP EAS samples
-#   input  : 1KGP+SGDP+TWB2 PCA (PC1~PC6) 
-# Prediction : TWB2
-#   input  : 1KGP+SGDP+TWB2 PCA (PC1~PC6)
+#   input  : 1KGP+SGDP+TWB1 PCA (PC1~PC6) 
+# Prediction : TWB1
+#   input  : 1KGP+SGDP+TWB1 PCA (PC1~PC6)
 #
 # Classes:
 #   AFR / AMR / EAS / EUR / SAS
@@ -13,8 +13,16 @@
 #   otherwise     -> UNCLASSIFIED
 # ============================================================
 
-setwd("/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis")
+setwd("/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis")
+
+# Install the package if it isn't already installed
+if (!require("randomForest", character.only = TRUE)) {
+  install.packages("randomForest")
+}
+
+# Load the library
 library(randomForest)
+
 
 # ============================================================
 # 1. 1KGP metadata
@@ -29,35 +37,35 @@ pop_1kgp <- read.table(
 
 
 # ============================================================
-# 2. TWB2 FAM
+# 2. TWB1 FAM
 # ============================================================
 
-TWB2 <- read.delim(
-  "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/King/TWB2_S05.fam",
+TWB1 <- read.delim(
+  "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Primary_SNP_QC/TWB1_S03_all_QC_clean.fam",
   header = FALSE,
   sep = "",
   quote = ""
 )
 
-twb2fam <- data.frame(
-  IID = TWB2$V2,
+TWB1fam <- data.frame(
+  IID = TWB1$V2,
   stringsAsFactors = FALSE
 )
 
-rm(TWB2)
+rm(TWB1)
 
 
 # ============================================================
 # 3. PCA
 # ============================================================
 
-twb2pca <- read.table(
-  "/SATA2TB/Taiwan_Biobank/TWB2_genotyped_GP_v20251211_n138615/Population_structure_analysis/meta_twb2_pca/TWB2_S05_pca.eigenvec",
+TWB1pca <- read.table(
+  "/SATA2TB/Taiwan_Biobank/TWB1_genotyped_GP_v20251211_n27652/Population_structure_analysis/meta_twb1_pca/TWB1_S04_pca.eigenvec",
   header = FALSE,
   stringsAsFactors = FALSE
 )
 
-colnames(twb2pca)[1:8] <- c(
+colnames(TWB1pca)[1:8] <- c(
   "FID",
   "IID",
   "PC1",
@@ -74,7 +82,7 @@ colnames(twb2pca)[1:8] <- c(
 # ============================================================
 
 train <- merge(
-  twb2pca[, c("IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6")],
+  TWB1pca[, c("IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6")],
   pop_1kgp[, c("Sample.name", "Superpopulation.code")],
   by.x = "IID",
   by.y = "Sample.name"
@@ -149,16 +157,16 @@ print(importance(rf_model))
 
 
 # ============================================================
-# 8. TWB2 prediction data
+# 8. TWB1 prediction data
 # ============================================================
 
-twb2 <- twb2pca[
-  twb2pca$IID %in% twb2fam$IID,
+TWB1 <- TWB1pca[
+  TWB1pca$IID %in% TWB1fam$IID,
   c("IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6")
 ]
 
-twb2 <- twb2[
-  complete.cases(twb2[, c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6")]),
+TWB1 <- TWB1[
+  complete.cases(TWB1[, c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6")]),
 ]
 
 
@@ -168,7 +176,7 @@ twb2 <- twb2[
 
 rf_prob <- predict(
   rf_model,
-  newdata = twb2[, c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6")],
+  newdata = TWB1[, c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6")],
   type = "prob"
 )
 
@@ -179,13 +187,13 @@ rf_prob <- predict(
 
 rf_pred <- predict(
   rf_model,
-  newdata = twb2[, c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6")],
+  newdata = TWB1[, c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6")],
   type = "response"
 )
 
 
 classification <- ifelse(
-  rf_prob[, "EAS"] > 0.8,
+  rf_prob[, "EAS"] > 0.9,
   "EAS",
   "UNCLASSIFIED"
 )
@@ -196,7 +204,7 @@ classification <- ifelse(
 # ============================================================
 
 rf_result <- data.frame(
-  IID = twb2$IID,
+  IID = TWB1$IID,
   
   P_AFR = rf_prob[, "AFR"],
   P_AMR = rf_prob[, "AMR"],
@@ -214,6 +222,16 @@ rf_result <- data.frame(
 eas <- rf_result[rf_result$Final_classification == "EAS",]$IID
 no_eas <- rf_result[rf_result$Final_classification != "EAS",]$IID
 
+eas_id <- data.frame(
+  IID = eas,
+  FID = eas,
+  stringsAsFactors = FALSE) 
+
+no_eas_id <- data.frame(
+  IID = no_eas,
+  FID = no_eas,
+  stringsAsFactors = FALSE) 
+
 # ============================================================
 # 13. Result summary
 # ============================================================
@@ -226,9 +244,6 @@ print(
   table(rf_result$Final_classification)
 )
 
-eas_id <- data.frame(FID = eas, IID = eas)
-no_eas_id <- data.frame(FID = no_eas, IID = no_eas)
-
 
 # ============================================================
 # 14. Save result
@@ -236,7 +251,7 @@ no_eas_id <- data.frame(FID = no_eas, IID = no_eas)
 
 write.table(
   rf_result,
-  file = "TWB2_RF_EAS_prediction.tsv",
+  file = "TWB1_RF_EAS_prediction.tsv",
   sep = "\t",
   quote = FALSE,
   row.names = FALSE
@@ -244,7 +259,7 @@ write.table(
 
 write.table(
   eas_id,
-  file = "TWB2_EAS.id",
+  file = "TWB1_EAS.id",
   sep = "\t",
   quote = FALSE,
   row.names = FALSE,
@@ -253,7 +268,7 @@ write.table(
 
 write.table(
   no_eas_id,
-  file = "TWB2_NOT_EAS.id",
+  file = "TWB1_NOT_EAS.id",
   sep = "\t",
   quote = FALSE,
   row.names = FALSE,
