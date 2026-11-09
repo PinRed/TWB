@@ -83,16 +83,32 @@ Perform initial SNP-level quality control.
 **Output:**
 - `TWB_S03_all_QC_clean`
 
-## 3. Population Structure Analysis
+## 3. Batch-Level SNP QC
+
+Perform quality control for each genotyping batch.
+
+### Missingness Filtering
+
+- SNP missing rate > 10%
+- Individual missing rate > 10%
+- SNP missing rate > 5%
+
+### Batch Comparison
+
+- Calculate SNP missingness.
+- Calculate allele frequency.
+- Identify common SNPs across all batches.
+- Generate SNP intersection across batches.
+
+## 4. Population Structure Analysis
 
 Evaluate population structure using TWB and 1000 Genomes Project (1KGP) reference data.
 
 ### Preprocessing
 
-- Filter related samples.
 - Filter batch-effect SNPs.
 - Remove high-LD regions.
-- Extract common SNPs between 1KGP and TWB (hg38).
+- Extract common SNPs between 1KGP and TWB .
 - Remove non-strand-ambiguous SNPs, as specified in the workflow.
 
 ### LD Pruning
@@ -108,7 +124,7 @@ Evaluate population structure using TWB and 1000 Genomes Project (1KGP) referenc
 - Evaluate population structure.
 - Identify East Asian (EAS) ancestry samples.
 
-## 4. Genetic Ancestry Classification
+## 5. Genetic Ancestry Classification
 
 Classify samples using a Random Forest model.
 
@@ -118,7 +134,7 @@ Classify samples using a Random Forest model.
   - P(EAS) < 0.8
 - Retain EAS samples for downstream analyses.
 
-## 5. Relatedness and Kinship Analysis
+## 6. Relatedness and Kinship Analysis
 
 ### KING
 
@@ -143,39 +159,8 @@ Perform principal component analysis accounting for relatedness.
 - Identify unrelated samples.
 - Perform PCAiR analysis.
 
-## 6. Batch-Level SNP QC
 
-Perform quality control for each genotyping batch.
-
-### Missingness Filtering
-
-- SNP missing rate > 10%
-- Individual missing rate > 10%
-- SNP missing rate > 5%
-
-### Batch Comparison
-
-- Calculate SNP missingness.
-- Calculate allele frequency.
-- Identify common SNPs across all batches.
-- Generate SNP intersection across batches.
-
-## 7. EAS Population Structure Analysis
-
-Perform population structure analysis using selected EAS samples.
-
-- Extract EAS samples.
-- Filter batch-effect SNPs.
-- Apply SNP QC:
-  - MAF > 5%
-  - GCR < 99%
-- Perform LD pruning:
-  - Window size: 5000 kb
-  - LD threshold: 0.3
-  - Reference: TWB 2022
-- Perform PCAiR analysis.
-
-## 8. Final SNP QC
+## 7. Final SNP QC
 
 Perform SNP quality control using the final EAS sample set.
 
@@ -195,7 +180,7 @@ Identify SNPs with potential batch effects.
 - Allele frequency difference > 0.10
 
 
-## 9. Genotype Harmonization
+## 8. Genotype Harmonization
 
 Perform genotype harmonization before imputation to ensure allele consistency with the reference panel.
 
@@ -231,7 +216,7 @@ Perform genotype harmonization before imputation to ensure allele consistency wi
   - Keep successfully harmonized variants after strand flipping or allele swapping.
 
 
-## 10. Genotype Imputation
+## 9. Genotype Imputation
 
 Prepare genotype data for imputation.
 
