@@ -83,32 +83,7 @@ Perform initial SNP-level quality control.
 **Output:**
 - `TWB_S03_all_QC_clean`
 
-## 3. Relatedness and Kinship Analysis
-
-### KING
-
-Identify genetic relationships between samples.
-
-- SNP QC:
-  - MAF > 5%
-  - GCR < 99%
-- LD pruning:
-  - Window size: 5000 kb
-  - LD threshold: 0.3
-  - Reference: TWB 2022
-- Kinship threshold:
-  - Kinship > 0.0084
-- Generate kinship matrix.
-
-### PCAiR
-
-Perform principal component analysis accounting for relatedness.
-
-- Identify related samples.
-- Identify unrelated samples.
-- Perform PCAiR analysis.
-
-## 4. Population Structure Analysis
+## 3. Population Structure Analysis
 
 Evaluate population structure using TWB and 1000 Genomes Project (1KGP) reference data.
 
@@ -133,7 +108,7 @@ Evaluate population structure using TWB and 1000 Genomes Project (1KGP) referenc
 - Evaluate population structure.
 - Identify East Asian (EAS) ancestry samples.
 
-## 5. Genetic Ancestry Classification
+## 4. Genetic Ancestry Classification
 
 Classify samples using a Random Forest model.
 
@@ -142,6 +117,31 @@ Classify samples using a Random Forest model.
 - Remove samples with:
   - P(EAS) < 0.8
 - Retain EAS samples for downstream analyses.
+
+## 5. Relatedness and Kinship Analysis
+
+### KING
+
+Identify genetic relationships between samples.
+
+- SNP QC:
+  - MAF > 5%
+  - GCR < 99%
+- LD pruning:
+  - Window size: 5000 kb
+  - LD threshold: 0.3
+  - Reference: TWB 2022
+- Kinship threshold:
+  - Kinship > 0.0084
+- Generate kinship matrix.
+
+### PCAiR
+
+Perform principal component analysis accounting for relatedness.
+
+- Identify related samples.
+- Identify unrelated samples.
+- Perform PCAiR analysis.
 
 ## 6. Batch-Level SNP QC
 
