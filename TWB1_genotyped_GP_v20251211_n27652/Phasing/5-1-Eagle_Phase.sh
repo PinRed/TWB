@@ -18,7 +18,7 @@ OUT_DIR="Phased_Impute_VCF"
 LOG_DIR="${OUT_DIR}/logs"
 
 EAGLE="../../Tools/Eagle_v2.4.1/eagle"
-MINIMAC4="Minimac4"
+MINIMAC4="minimac4"
 
 THREADS=16
 
@@ -101,6 +101,13 @@ for chr in {1..22}; do
     fi
 
     # --------------------------------------
+    # Bcftools index the phased VCF
+    # --------------------------------------
+    
+    PHASE_VCF="${PHASE_OUT}.vcf.gz"
+    bcftools index -f "$PHASE_VCF"
+
+    # --------------------------------------
     # Step 2: Minimac4 Imputation
     # --------------------------------------
 
@@ -108,7 +115,7 @@ for chr in {1..22}; do
 
     if ! /usr/bin/time -v \
         "$MINIMAC4" \
-        --refHaps "$REF_MSAV=" \
+        --refHaps "$REF_MSAV" \
         --haps "$PHASE_VCF" \
         --window 500000 \
         --prefix "$IMPUTE_OUT" \

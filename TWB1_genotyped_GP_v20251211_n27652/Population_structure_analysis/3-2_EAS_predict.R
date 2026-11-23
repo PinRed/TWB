@@ -193,7 +193,7 @@ rf_pred <- predict(
 
 
 classification <- ifelse(
-  rf_prob[, "EAS"] > 0.9,
+  rf_prob[, "EAS"] > 0.8,
   "EAS",
   "UNCLASSIFIED"
 )

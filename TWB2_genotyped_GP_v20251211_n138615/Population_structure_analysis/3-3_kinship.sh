@@ -24,10 +24,17 @@
 # Step 4: KING relatedness check
 
 ARRAY=TWB2
-input="$../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean"
+input="../Primary_SNP_QC/${ARRAY}_S03_all_QC_clean"
 
 plink2 \
   --bfile ${input} \
+  --keep ${ARRAY}_EAS.id \
+  --extract ../Batch-level_SNP_QC/intersect_snps.id \
+  --make-bed \
+  --out ${ARRAY}_S04_EAS
+
+plink2 \
+  --bfile ${ARRAY}_S04_EAS \
   --geno 0.01 \
   --maf 0.05 \
   --make-bed \

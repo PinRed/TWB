@@ -2,6 +2,7 @@
 set -Eeuo pipefail
 INPUT="1kgp_v5/EAS_filtered"
 OUTPUT="1kgp_v5/Minimac_ReHap"
+mkdir -p ${OUTPUT}
 
 for chr in {1..22}; do
     echo "=================================="
