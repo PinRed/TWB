@@ -236,5 +236,5 @@ Summary of genotype quality control (QC) procedures for Taiwan Biobank Phase 1 (
 | **Primary SNP QC** | Samples: 27,323<br>SNPs: 611,991 | Samples: 138,615<br>SNPs: 571,914 | Structural SNP filtering:<br>MAF = 0<br>Missingness < 98% | `TWBX_S03_all_QC_clean` |
 | **EAS Kinship Filtering** | Samples: 25,206<br>SNPs: 611,898 | Samples: 136,984<br>SNPs: 539,122 | Remove batch-associated SNPs<br>Remove related samples (Kinship > 0.0884) | `TWBX_S05` |
 | **Meta PCA** | Samples: 25,206<br>SNPs: 62,944 | Samples: 136,984<br>SNPs: 47,514 | Combined datasets: 1KGP + SGDP + TWB | `TWBX_S05_pca` |
-| **EAS PCAiR** | Samples: 25,205<br>SNPs: 147,313 | Samples: 136,979<br>SNPs: 142,833 | Select EAS samples<br>Remove batch-associated SNPs<br>MAF < 0.05<br>Missingness < 99%<br>LD pruning: 5000 kb, r² = 0.3 | `TWBX__EAS_pcair_kin` |
-| **Final SNP QC** | Samples: 25,205<br>SNPs: 586,508 | Samples: 136,979<br>SNPs: 479,138 | Start from Primary SNP QC<br>Select EAS samples<br>SNP missingness < 98%<br>MAF = 0<br>HWE < 1e-6<br>Batch-effect SNP filtering | `TWBX_F_SNPQC05_clean` |
+| **EAS PCAiR** | Samples: 25,205<br>SNPs: 147,313 | Samples: 116,548<br>SNPs: 142,833 | Select EAS samples<br>Remove batch-associated SNPs<br>MAF < 0.05<br>Missingness < 99%<br>LD pruning: 5000 kb, r² = 0.3 | `TWBX__EAS_pcair_kin` |
+| **Final SNP QC** | Samples: 25,205<br>SNPs: 586,508 | Samples: 116,548<br>SNPs: 479,138 | Start from Primary SNP QC<br>Select EAS samples<br>SNP missingness < 98%<br>MAF = 0<br>HWE < 1e-6<br>Batch-effect SNP filtering | `TWBX_F_SNPQC05_clean` |
