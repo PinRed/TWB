@@ -224,6 +224,20 @@ Prepare genotype data for imputation.
 - Submit VCF files to the Taiwan Biobank Imputation Server.
 - Perform genotype imputation.
 
+## 10. Phasing and Imputation
+### Reference
+GRCh38 : [1000 Genome (20220422)](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/)
+- Catch EAS population
+- Keep MAC >= 0
+
+### Phasing
+- Eagle v2.4.1
+- Chromosome 1 ~ 22
+- Map : Eagle offer
+
+### Imputation
+- Minimac4
+
 
 ## Quality Control Summary
 
