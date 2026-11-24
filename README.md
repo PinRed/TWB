@@ -238,6 +238,9 @@ GRCh38 : [1000 Genome (20220422)](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/dat
 ### Imputation
 - Minimac4
 
+| Chr | TWB2 Imputation | TWB2 Imputation QC | Retemtion rate |
+|---|---|---|---|
+| 20 | 249927 <br> 152G | 212668 <br> 139G | 85.09% |
 
 ## Quality Control Summary
 
